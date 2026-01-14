@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowRight, Sparkles, Activity, DollarSign, Layers } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 import { TickerData } from "@/lib/market-data";
@@ -132,10 +133,12 @@ export function QuantumHero({ marketData }: QuantumHeroProps) {
                     transition={{ delay: 0.6 }}
                     className="flex flex-col sm:flex-row items-center justify-center gap-4"
                 >
-                    <Button size="lg" className="relative group bg-cyan-500 hover:bg-cyan-400 text-black font-bold h-12 px-8 rounded-full glow-cyan transition-all duration-300 transform hover:scale-105">
-                        <span className="relative z-10 flex items-center gap-2">
-                            Launch Console <ArrowRight className="w-4 h-4" />
-                        </span>
+                    <Button asChild size="lg" className="relative group bg-cyan-500 hover:bg-cyan-400 text-black font-bold h-12 px-8 rounded-full glow-cyan transition-all duration-300 transform hover:scale-105">
+                        <Link href="/analyzer">
+                            <span className="relative z-10 flex items-center gap-2">
+                                Launch Console <ArrowRight className="w-4 h-4" />
+                            </span>
+                        </Link>
                     </Button>
 
 
