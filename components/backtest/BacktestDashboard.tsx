@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ManualStrategyForm } from "./ManualStrategyForm";
 import { AIStrategyChat } from "./AIStrategyChat";
 import { BacktestResults } from "./BacktestResults";
-import { StrategyConfig, BacktestResult, BacktestService, Rule } from "@/lib/services/backtestService";
+import { StrategyConfig, BacktestResult, BacktestService, Rule, IndicatorConfig } from "@/lib/services/backtestService";
 import { Candle } from "@/lib/services/marketService";
 import { PRE_BACKTESTED_STRATEGIES } from "@/lib/data/strategies";
 import { Loader2, Zap, BrainCircuit, Activity, Search, BarChart3, Globe, ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle, Target } from "lucide-react";
@@ -63,10 +63,10 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
             const parts = clean.split(splitKey);
             if (parts.length < 2) return null;
 
-            const parseIndicator = (str: string): any => {
+            const parseIndicator = (str: string): IndicatorConfig => {
                 str = str.trim();
                 const matchInd = str.match(/(SMA|EMA|RSI)\((\d+)\)/i);
-                if (matchInd) return { type: matchInd[1].toUpperCase(), period: parseInt(matchInd[2]) };
+                if (matchInd && matchInd[1] && matchInd[2]) return { type: matchInd[1].toUpperCase() as any, period: parseInt(matchInd[2]) };
                 if (/price/i.test(str)) return { type: "PRICE" };
                 if (!isNaN(parseFloat(str))) return { type: "RSI", value: parseFloat(str) };
                 return { type: "PRICE" };
@@ -111,10 +111,10 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
                 const strategy = PRE_BACKTESTED_STRATEGIES.find(s => s.id === strategyId);
                 if (strategy) {
                     if (activeTab === "ai") {
-                        const context = `${strategy.name}\n${strategy.conditions.join("\n")}\nStop Loss: ${strategy.stopLossPercent}% | Take Profit: ${strategy.takeProfitPercent}%`;
+                        const context = `${strategy.name}\n${(strategy as any).conditions.join("\n")}\nStop Loss: ${strategy.stopLossPercent}% | Take Profit: ${strategy.takeProfitPercent}%`;
                         setAiContext(context);
                     } else {
-                        const newConfig = parseStrategyToConfig(strategy);
+                        const newConfig = parseStrategyToConfig(strategy as any);
                         setStrategyToEdit(newConfig);
                         setActiveTab("manual");
                     }
@@ -312,7 +312,15 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
     );
 }
 
-function KpiCard({ label, value, subValue, icon: Icon, trend }: any) {
+interface KpiCardProps {
+    label: string;
+    value: string | number;
+    subValue?: string;
+    icon: React.ElementType;
+    trend?: "up" | "down" | "neutral";
+}
+
+function KpiCard({ label, value, subValue, icon: Icon, trend }: KpiCardProps) {
     return (
         <div className="bg-card border border-border/50 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:border-border/80 transition-all">
             <div className={`absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform ${trend === "up" ? "text-green-500" : trend === "down" ? "text-red-500" : "text-gray-500"}`}>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Bot, Zap, MessageSquare } from "lucide-react";
+import { Bot, Zap, MessageSquare, LucideIcon } from "lucide-react";
 import { ChatDialog } from "./ChatDialog";
 
 interface ModelResult {
@@ -63,7 +63,7 @@ function ModelCard({
     onChat
 }: {
     result: ModelResult;
-    icon: any;
+    icon: LucideIcon;
     colorClass: string;
     iconColor: string;
     onChat: () => void;

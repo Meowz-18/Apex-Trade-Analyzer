@@ -2,7 +2,9 @@
 
 import { BacktestResult } from "@/lib/services/backtestService";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle, Target } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle, Target, LucideIcon } from "lucide-react";
+
+
 
 export function BacktestResults({ result }: { result: BacktestResult }) {
     const isProfitable = result.totalPnLPercent > 0;
@@ -134,7 +136,15 @@ export function BacktestResults({ result }: { result: BacktestResult }) {
     );
 }
 
-function KpiCard({ label, value, subValue, icon: Icon, trend }: any) {
+interface KpiCardProps {
+    label: string;
+    value: string;
+    subValue?: string;
+    icon: LucideIcon;
+    trend?: "up" | "down" | "neutral";
+}
+
+function KpiCard({ label, value, subValue, icon: Icon, trend }: KpiCardProps) {
     return (
         <div className="bg-card border border-border/50 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:border-border/80 transition-all">
             <div className={`absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform ${trend === "up" ? "text-green-500" : trend === "down" ? "text-red-500" : "text-gray-500"}`}>

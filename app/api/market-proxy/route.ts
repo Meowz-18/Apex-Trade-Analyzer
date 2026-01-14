@@ -7,6 +7,15 @@ export async function GET() {
         "XRPUSDT", "ADAUSDT"
     ];
 
+    // ... existing code ...
+
+    interface BinanceTicker {
+        symbol: string;
+        lastPrice: string;
+        priceChangePercent: string;
+        prevClosePrice: string;
+    }
+
     // 1. Try Binance First (Real-time, accurate)
     try {
         const response = await fetch("https://api.binance.com/api/v3/ticker/24hr", {
@@ -16,10 +25,10 @@ export async function GET() {
 
         if (response.ok) {
             const data = await response.json();
-            const filteredData: Record<string, any> = {};
+            const filteredData: Record<string, { price: number; change: number; prevPrice: number }> = {};
 
             if (Array.isArray(data)) {
-                data.forEach((item: any) => {
+                data.forEach((item: BinanceTicker) => {
                     if (targetSymbols.includes(item.symbol)) {
                         filteredData[item.symbol] = {
                             price: parseFloat(item.lastPrice),
@@ -56,14 +65,20 @@ export async function GET() {
                 "cardano": "ADAUSDT"
             };
 
-            const mappedData: Record<string, any> = {};
-            Object.entries(data).forEach(([key, value]: [string, any]) => {
+            interface CoinGeckoPrice {
+                usd: number;
+                usd_24h_change: number;
+            }
+
+            const mappedData: Record<string, { price: number; change: number; prevPrice: number }> = {};
+            Object.entries(data).forEach(([key, value]) => {
                 const symbol = mapping[key];
+                const priceData = value as CoinGeckoPrice;
                 if (symbol) {
                     mappedData[symbol] = {
-                        price: value.usd,
-                        change: value.usd_24h_change,
-                        prevPrice: value.usd // Approximate since we don't have prev close easily, but acceptable for fallback
+                        price: priceData.usd,
+                        change: priceData.usd_24h_change,
+                        prevPrice: priceData.usd // Approximate since we don't have prev close easily, but acceptable for fallback
                     };
                 }
             });

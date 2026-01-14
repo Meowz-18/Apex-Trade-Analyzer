@@ -1,11 +1,11 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, ThreeElements } from '@react-three/fiber';
 import { Float, PerspectiveCamera, Environment, MeshTransmissionMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
-function LogoGeometry(props: any) {
+function LogoGeometry(props: ThreeElements['mesh']) {
     const mesh = useRef<THREE.Mesh>(null!);
     const [hovered, setHover] = useState(false);
 

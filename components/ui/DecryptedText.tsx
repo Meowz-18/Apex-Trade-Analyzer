@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 
 const styles: Record<string, React.CSSProperties> = {
     wrapper: {
@@ -18,7 +18,7 @@ const styles: Record<string, React.CSSProperties> = {
     }
 };
 
-interface DecryptedTextProps {
+interface DecryptedTextProps extends Omit<HTMLMotionProps<"span">, "children"> {
     text: string;
     speed?: number;
     maxIterations?: number;
@@ -30,7 +30,6 @@ interface DecryptedTextProps {
     parentClassName?: string;
     encryptedClassName?: string;
     animateOn?: 'view' | 'hover' | 'both';
-    [key: string]: any; // Allow other props
 }
 
 export default function DecryptedText({

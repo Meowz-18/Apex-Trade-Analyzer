@@ -27,8 +27,8 @@ export function ManualStrategyForm({ onRun, isRunning, initialStrategy }: Manual
         if (initialStrategy) {
             setEntryRules(initialStrategy.entryRules);
             setExitRules(initialStrategy.exitRules);
-            setStopLoss(initialStrategy.stopLossPercent);
-            setTakeProfit(initialStrategy.takeProfitPercent);
+            setStopLoss(initialStrategy.stopLossPercent ?? 2);
+            setTakeProfit(initialStrategy.takeProfitPercent ?? 4);
         }
     }, [initialStrategy]);
 
@@ -52,14 +52,14 @@ export function ManualStrategyForm({ onRun, isRunning, initialStrategy }: Manual
         else setExitRules(exitRules.filter((_, i) => i !== idx));
     };
 
-    const updateRule = (section: "entry" | "exit", idx: number, field: keyof Rule, value: any) => {
+    const updateRule = (section: "entry" | "exit", idx: number, field: keyof Rule, value: string | number | IndicatorConfig | undefined) => {
         const rules = section === "entry" ? [...entryRules] : [...exitRules];
         rules[idx] = { ...rules[idx], [field]: value };
         if (section === "entry") setEntryRules(rules);
         else setExitRules(rules);
     };
 
-    const updateIndicator = (section: "entry" | "exit", ruleIdx: number, side: "indicatorA" | "indicatorB", field: keyof IndicatorConfig, value: any) => {
+    const updateIndicator = (section: "entry" | "exit", ruleIdx: number, side: "indicatorA" | "indicatorB", field: keyof IndicatorConfig, value: string | number | undefined) => {
         const rules = section === "entry" ? [...entryRules] : [...exitRules];
         const currentInd = rules[ruleIdx][side];
 

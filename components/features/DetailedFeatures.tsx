@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { Shield, Zap, TrendingUp, Lock, Globe, BarChart3, Database, FileText, Share2, Activity, Cpu, Layers } from "lucide-react";
+import { Shield, Zap, TrendingUp, Lock, Globe, BarChart3, Database, FileText, Share2, Activity, Cpu, Layers, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const features = [
@@ -69,7 +69,7 @@ export function DetailedFeatures() {
     return (
         <div className="py-32 md:py-48 px-4 md:px-8 max-w-7xl mx-auto">
             <div className="text-center mb-32 space-y-4">
-                <motion.h2 
+                <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
@@ -77,7 +77,7 @@ export function DetailedFeatures() {
                 >
                     Engineered for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">Alpha.</span>
                 </motion.h2>
-                <motion.p 
+                <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -96,7 +96,16 @@ export function DetailedFeatures() {
     );
 }
 
-function FeatureCard({ feature, index, image }: { feature: any; index: number; image: string }) {
+interface Feature {
+    title: string;
+    description: string;
+    icon: LucideIcon;
+    gradient: string;
+    border: string;
+    text: string;
+}
+
+function FeatureCard({ feature, index, image }: { feature: Feature; index: number; image: string }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -107,13 +116,13 @@ function FeatureCard({ feature, index, image }: { feature: any; index: number; i
         >
             {/* Internal "Frame" Padding */}
             <div className="absolute inset-2 md:inset-3 rounded-2xl overflow-hidden bg-black/40 flex flex-col justify-end p-8 border border-white/5 group-hover:border-white/10 transition-colors">
-                
+
                 {/* Background Image/Asset */}
                 <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-700">
-                     <img 
-                        src={image} 
-                        alt={feature.title} 
-                        className="w-full h-full object-cover object-center scale-110 group-hover:scale-100 transition-transform duration-[1.5s]" 
+                    <img
+                        src={image}
+                        alt={feature.title}
+                        className="w-full h-full object-cover object-center scale-110 group-hover:scale-100 transition-transform duration-[1.5s]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
                 </div>
@@ -123,11 +132,11 @@ function FeatureCard({ feature, index, image }: { feature: any; index: number; i
                     <div className={`h-12 w-12 rounded-full backdrop-blur-md bg-white/10 border border-white/10 flex items-center justify-center mb-4 ${feature.text}`}>
                         <feature.icon className="h-5 w-5" />
                     </div>
-                    
+
                     <h3 className="text-3xl font-bold text-white mb-3 tracking-tight font-serif">
                         {feature.title}
                     </h3>
-                    
+
                     <p className="text-white/60 leading-relaxed font-light text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
                         {feature.description}
                     </p>

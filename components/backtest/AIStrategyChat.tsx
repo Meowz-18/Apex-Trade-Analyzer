@@ -27,19 +27,24 @@ export function AIStrategyChat({ onRun, isRunning, onEdit, initialContext }: AIS
         content: "Describe your trading strategy, and I'll configure the engine for you. \n\nExample: 'Buy when RSI is below 30 and sells when RSI crosses above 70.'"
     }]);
 
+    const lastContextRef = useRef<string | null>(null);
+
     // Effect to handle initial context injection
     useEffect(() => {
-        if (initialContext) {
+        if (initialContext && initialContext !== lastContextRef.current) {
+            lastContextRef.current = initialContext;
+
             setMessages(prev => [
                 ...prev,
-                { id: "context-user", role: "user", content: `I want to test this strategy: ${initialContext}` }
+                { id: `context-${Date.now()}`, role: "user", content: `I want to test this strategy: ${initialContext}` }
             ]);
+
             // Auto-trigger analysis for the injected context
             setIsTyping(true);
             setTimeout(() => {
                 const strategy = parseStrategyFromText(initialContext);
                 const responseMsg: Message = {
-                    id: (Date.now() + 1).toString(),
+                    id: `response-${Date.now()}`,
                     role: "assistant",
                     content: strategy
                         ? `I've loaded the strategy rules for "${initialContext.split('\n')[0]}". You can confirm or refine them below.`
@@ -61,7 +66,7 @@ export function AIStrategyChat({ onRun, isRunning, onEdit, initialContext }: AIS
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, [messages, isTyping]);
 
-    const handleSend = async (e: React.FormEvent) => {
+    const handleSend = async (e: React.FormEvent | React.KeyboardEvent) => {
         e.preventDefault();
         if (!input.trim()) return;
 
@@ -135,7 +140,7 @@ export function AIStrategyChat({ onRun, isRunning, onEdit, initialContext }: AIS
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
-                                handleSend(e as any);
+                                handleSend(e);
                             }
                         }}
                         rows={1}
