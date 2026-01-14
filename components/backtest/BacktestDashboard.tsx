@@ -13,7 +13,7 @@ import { BacktestResults } from "./BacktestResults";
 import { StrategyConfig, BacktestResult, BacktestService, Rule, IndicatorConfig } from "@/lib/services/backtestService";
 import { Candle } from "@/lib/services/marketService";
 import { PRE_BACKTESTED_STRATEGIES } from "@/lib/data/strategies";
-import { Loader2, Zap, BrainCircuit, Activity, Search, BarChart3, Globe, ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle, Target } from "lucide-react";
+import { Loader2, Zap, BrainCircuit, Activity, Search, BarChart3, Globe, ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle, Target, LucideIcon } from "lucide-react";
 
 // Generic fetcher
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -111,10 +111,10 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
                 const strategy = PRE_BACKTESTED_STRATEGIES.find(s => s.id === strategyId);
                 if (strategy) {
                     if (activeTab === "ai") {
-                        const context = `${strategy.name}\n${(strategy as any).conditions.join("\n")}\nStop Loss: ${strategy.stopLossPercent}% | Take Profit: ${strategy.takeProfitPercent}%`;
+                        const context = `${strategy.name}\n${strategy.conditions.join("\n")}\nStop Loss: ${strategy.stopLossPercent}% | Take Profit: ${strategy.takeProfitPercent}%`;
                         setAiContext(context);
                     } else {
-                        const newConfig = parseStrategyToConfig(strategy as any);
+                        const newConfig = parseStrategyToConfig(strategy);
                         setStrategyToEdit(newConfig);
                         setActiveTab("manual");
                     }
@@ -316,7 +316,7 @@ interface KpiCardProps {
     label: string;
     value: string | number;
     subValue?: string;
-    icon: React.ElementType;
+    icon: LucideIcon;
     trend?: "up" | "down" | "neutral";
 }
 

@@ -11,6 +11,8 @@ export interface StrategyData {
     conditions: string[];
     riskReward: string;
     bestFor: string;
+    stopLossPercent?: number;
+    takeProfitPercent?: number;
 }
 
 export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
@@ -28,7 +30,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: SMA(50) crosses below SMA(200)"
         ],
         riskReward: "1:3",
-        bestFor: "Long-term trend capturing in crypto and stocks."
+        bestFor: "Long-term trend capturing in crypto and stocks.",
+        stopLossPercent: 5,
+        takeProfitPercent: 15
     },
     {
         id: "rsi-reversal",
@@ -44,7 +48,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: RSI(14) > 70"
         ],
         riskReward: "1:1.5",
-        bestFor: "Ranging markets or sideways choppy consolidation."
+        bestFor: "Ranging markets or sideways choppy consolidation.",
+        stopLossPercent: 3,
+        takeProfitPercent: 4.5
     },
     {
         id: "bollinger-squeeze",
@@ -60,7 +66,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: Price crosses below SMA(20)"
         ],
         riskReward: "1:4",
-        bestFor: "Catching sudden volatility expansion."
+        bestFor: "Catching sudden volatility expansion.",
+        stopLossPercent: 2,
+        takeProfitPercent: 8
     },
     {
         id: "macd-momentum",
@@ -76,7 +84,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: EMA(12) crosses below EMA(26)"
         ],
         riskReward: "1:2.5",
-        bestFor: "Strong momentum phases in volatile assets."
+        bestFor: "Strong momentum phases in volatile assets.",
+        stopLossPercent: 4,
+        takeProfitPercent: 10
     },
     {
         id: "ema-crossover-fast",
@@ -92,7 +102,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: EMA(9) crosses below EMA(21)"
         ],
         riskReward: "1:2",
-        bestFor: "Intraday scalping during active market hours."
+        bestFor: "Intraday scalping during active market hours.",
+        stopLossPercent: 1.5,
+        takeProfitPercent: 3
     },
     {
         id: "stoch-rsi-scalp",
@@ -108,7 +120,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: RSI(14) > 80"
         ],
         riskReward: "1:1.2",
-        bestFor: "High-frequency scalping in liquid markets."
+        bestFor: "High-frequency scalping in liquid markets.",
+        stopLossPercent: 1,
+        takeProfitPercent: 1.2
     },
     {
         id: "inside-bar-breakout",
@@ -124,7 +138,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: Price crosses below EMA(8)"
         ],
         riskReward: "1:3",
-        bestFor: "Clean breakouts in trends."
+        bestFor: "Clean breakouts in trends.",
+        stopLossPercent: 2,
+        takeProfitPercent: 6
     },
     {
         id: "bullish-engulfing",
@@ -140,7 +156,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: RSI(14) > 60"
         ],
         riskReward: "1:2",
-        bestFor: "Swing trading reversals from key levels."
+        bestFor: "Swing trading reversals from key levels.",
+        stopLossPercent: 3,
+        takeProfitPercent: 6
     },
     {
         id: "supertrend-continuation",
@@ -156,7 +174,9 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: Price < SMA(50)"
         ],
         riskReward: "1:2.5",
-        bestFor: "Following strong, clear trends."
+        bestFor: "Following strong, clear trends.",
+        stopLossPercent: 4,
+        takeProfitPercent: 10
     },
     {
         id: "vwap-intraday",
@@ -172,6 +192,8 @@ export const PRE_BACKTESTED_STRATEGIES: StrategyData[] = [
             "Sell: Price > EMA(20)"
         ],
         riskReward: "1:1.5",
-        bestFor: "Day trading stocks or high-volume cryptos."
+        bestFor: "Day trading stocks or high-volume cryptos.",
+        stopLossPercent: 2,
+        takeProfitPercent: 3
     }
 ];
