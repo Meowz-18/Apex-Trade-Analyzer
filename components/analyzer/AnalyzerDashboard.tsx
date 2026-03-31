@@ -41,6 +41,8 @@ interface MarketData {
     modelB: SingleModelResult;
     news: NewsItem[];
     chartData: ChartData[];
+    // Currency
+    currency?: "USD" | "INR";
     // UI State for Timeframe
     activeTimeframe: string;
     onTimeframeChange: (tf: string) => void;
@@ -75,7 +77,7 @@ export function AnalyzerDashboard({ data }: AnalyzerDashboardProps) {
         >
             {/* Top Stats Row (Bento Style) */}
             <div className="col-span-12 grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <motion.div variants={item}><StatCard title="Current Price" value={`$${data.price.toLocaleString()}`} subValue={`${data.change > 0 ? '+' : ''}${data.change.toFixed(3)}%`} trend={data.change > 0 ? "up" : "down"} icon={DollarSign} /></motion.div>
+                <motion.div variants={item}><StatCard title="Current Price" value={`${data.currency === "INR" ? "₹" : "$"}${data.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} subValue={`${data.change > 0 ? '+' : ''}${data.change.toFixed(3)}%`} trend={data.change > 0 ? "up" : "down"} icon={DollarSign} /></motion.div>
                 <motion.div variants={item}><StatCard title="Market Cap" value={data.marketCap} icon={PieChart} /></motion.div>
                 <motion.div variants={item}><StatCard title="P/E Ratio" value={data.peRatio} icon={Activity} /></motion.div>
                 <motion.div variants={item}><StatCard title="Revenue" value={data.revenue} icon={TrendingUp} /></motion.div>

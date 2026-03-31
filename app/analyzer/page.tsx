@@ -7,6 +7,7 @@ import useSWR from "swr";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnalyzerDashboard } from "@/components/analyzer/AnalyzerDashboard";
 import { Disclaimer } from "@/components/shared/Disclaimer";
+import { formatSymbolName } from "@/lib/utils/formatters";
 
 type AssetType = "STOCK" | "CRYPTO" | "INDEX" | "INDIA";
 
@@ -198,8 +199,8 @@ function AnalyzerContent() {
                             placeholder={
                                 selectedType === "STOCK" ? "Search ticker (e.g. NVDA)..." :
                                     selectedType === "CRYPTO" ? "Search coin (e.g. BTC)..." :
-                                        selectedType === "INDIA" ? "Search NSE/BSE (e.g. RELIANCE.NS)..." :
-                                            "Search index (e.g. ^GSPC)..."
+                                        selectedType === "INDIA" ? "Search NSE/BSE (e.g. RELIANCE)..." :
+                                            "Search index (e.g. S&P 500)..."
                             }
                             className="block w-full rounded-xl border border-border bg-card py-4 pl-12 pr-32 text-lg text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all shadow-lg backdrop-blur-md"
                         />
@@ -274,7 +275,7 @@ function AnalyzerContent() {
                             onClick={() => { setSymbol(s); setActiveSymbol(s); }}
                             className="hover:text-primary underline cursor-pointer px-1"
                         >
-                            {s}
+                            {formatSymbolName(s)}
                         </button>
                     ))}
                 </div>
@@ -353,9 +354,10 @@ function AnalyzerContent() {
                         </div>
 
                         <AnalyzerDashboard data={{
-                            symbol: data.symbol,
+                            symbol: formatSymbolName(data.symbol),
                             price: data.marketData ? data.marketData.price : 0,
                             change: data.marketData ? data.marketData.change : 0,
+                            currency: selectedType === "INDIA" ? "INR" : "USD",
                             // Fallback static data for fields not in Simulation Engine yet
                             marketCap: data.symbol === "NVDA" ? "2.2T" : (selectedType === "CRYPTO" ? "N/A" : "N/A"),
                             peRatio: data.symbol === "NVDA" ? "74.5" : (selectedType === "CRYPTO" ? "N/A" : "N/A"),

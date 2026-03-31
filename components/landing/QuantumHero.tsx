@@ -145,10 +145,7 @@ export function QuantumHero({ marketData }: QuantumHeroProps) {
                 </motion.div>
 
                 {/* Quantum Market Ticker */}
-                <motion.div
-                    style={{ y: 50, opacity: useTransform(scrollY, [0, 300], [1, 0]) }}
-                    className="mt-20 w-full overflow-hidden"
-                >
+                <div className="mt-[130px] w-full overflow-hidden">
                     <div className="flex gap-6 animate-scroll w-max hover:[animation-play-state:paused]">
                         {displayItems.map((item, i) => (
                             <div
@@ -181,7 +178,7 @@ export function QuantumHero({ marketData }: QuantumHeroProps) {
                             </div>
                         ))}
                     </div>
-                </motion.div>
+                </div>
 
             </div>
         </section>

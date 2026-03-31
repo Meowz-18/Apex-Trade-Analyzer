@@ -3,6 +3,7 @@
 import { RealMarketService, AssetType } from "./realMarketService";
 import { MarketQuote } from "./marketService";
 import { calculateATR } from "@/lib/utils/indicators";
+import { formatSymbolName } from "@/lib/utils/formatters";
 
 // --- Shared News Templates ---
 const NEWS_TEMPLATES = {
@@ -165,7 +166,8 @@ export class AnalysisService {
         // Deterministic selection of template
         const templateIndex = (symbol.length + Math.floor(Math.abs(changePercent) * 10)) % templates.length;
         let reasoning = templates[templateIndex];
-        reasoning = reasoning.replace(/{symbol}/g, symbol).replace(/{name}/g, symbol);
+        const displaySymbol = formatSymbolName(symbol);
+        reasoning = reasoning.replace(/{symbol}/g, displaySymbol).replace(/{name}/g, displaySymbol);
 
         // Deterministic Confidence Calculation (Volatility Based)
         // Base confidence starts at 60% (Neutral)
@@ -189,7 +191,7 @@ export class AnalysisService {
         return { modelName, signal, confidence, reasoning };
     }
 
-    private static generateNews(symbol: string, changePercent: number) {
+    public static generateNews(symbol: string, changePercent: number) {
         return Array.from({ length: 3 }).map((_, i) => {
             let sentiment: "Positive" | "Negative" | "Neutral" = "Neutral";
 
@@ -207,7 +209,8 @@ export class AnalysisService {
             // Deterministic template selection
             const templateIndex = (symbol.length + i + Math.floor(Math.abs(changePercent) * 100)) % templates.length;
             const template = templates[templateIndex];
-            const title = template.replace(/{name}/g, symbol).replace(/{symbol}/g, symbol);
+            const displaySymbol = formatSymbolName(symbol);
+            const title = template.replace(/{name}/g, displaySymbol).replace(/{symbol}/g, displaySymbol);
 
             const sources = ["Bloomberg", "Reuters", "CoinDesk", "The Block", "WSJ"];
             const sourceIndex = (symbol.length + i) % sources.length;

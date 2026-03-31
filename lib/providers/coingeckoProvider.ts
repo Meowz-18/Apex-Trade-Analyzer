@@ -12,7 +12,9 @@ const COIN_MAP: Record<string, string> = {
     "ADA": "cardano",
     "AVAX": "avalanche-2",
     "DOT": "polkadot",
-    "LINK": "chainlink"
+    "LINK": "chainlink",
+    "UNI": "uniswap",
+    "SHIB": "shiba-inu"
 };
 
 export class CoinGeckoProvider {
@@ -38,7 +40,10 @@ export class CoinGeckoProvider {
                 }
             });
 
-            if (!response.ok) throw new Error(`CoinGecko API error: ${response.statusText}`);
+            if (!response.ok) {
+                console.warn(`CoinGecko API rate-limited or error for ${symbol}: ${response.statusText}`);
+                return null;
+            }
 
             const data = await response.json();
             const coinData = data[id];
@@ -53,7 +58,7 @@ export class CoinGeckoProvider {
                 timestamp: Date.now()
             };
         } catch (error) {
-            console.error(`CoinGeckoProvider Error (${symbol}):`, error);
+            console.warn(`CoinGeckoProvider Warning (${symbol}):`, error instanceof Error ? error.message : error);
             return null;
         }
     }
@@ -77,8 +82,8 @@ export class CoinGeckoProvider {
             });
 
             if (!response.ok) {
-                console.error(`CoinGecko API Error ${response.status}: ${await response.text()}`);
-                throw new Error(`CoinGecko API error: ${response.statusText}`);
+                console.warn(`CoinGecko API Error ${response.status}: ${await response.text()}`);
+                return [];
             }
 
             const data = await response.json();

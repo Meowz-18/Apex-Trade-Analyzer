@@ -19,6 +19,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { PageReveal } from "@/components/ui/PageReveal";
 import { PageBackground } from "@/components/layout/PageBackground";
+import { UserProvider } from "@/lib/providers/UserProvider";
 
 import { Disclaimer } from "@/components/layout/Disclaimer";
 
@@ -40,19 +41,21 @@ export default function RootLayout({
         <CustomCursor />
         <PageReveal />
         <SmoothScroll>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            forcedTheme="dark"
-            enableSystem={false}
-            disableTransitionOnChange
-          >
-            <PageBackground />
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <Disclaimer />
-          </ThemeProvider>
+          <UserProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              forcedTheme="dark"
+              enableSystem={false}
+              disableTransitionOnChange
+            >
+              <PageBackground />
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <Disclaimer />
+            </ThemeProvider>
+          </UserProvider>
         </SmoothScroll>
       </body>
     </html>

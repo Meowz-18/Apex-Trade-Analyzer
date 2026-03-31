@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useSWR from "swr";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -13,7 +13,8 @@ import { BacktestResults } from "./BacktestResults";
 import { StrategyConfig, BacktestResult, BacktestService, Rule, IndicatorConfig } from "@/lib/services/backtestService";
 import { Candle } from "@/lib/services/marketService";
 import { PRE_BACKTESTED_STRATEGIES } from "@/lib/data/strategies";
-import { Loader2, Zap, BrainCircuit, Activity, Search, BarChart3, Globe, ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle, Target, LucideIcon } from "lucide-react";
+import { saveBacktestResult, getSavedBacktests, saveStrategy } from "@/lib/supabase/backtestDb";
+import { Loader2, Zap, BrainCircuit, Activity, Search, BarChart3, Globe, ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle, Target, LucideIcon, Save, History, Trash2, CheckCircle2 } from "lucide-react";
 
 // Generic fetcher
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -27,6 +28,14 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
     const [result, setResult] = useState<BacktestResult | null>(null);
     const [activeTab, setActiveTab] = useState("manual");
     const [strategyToEdit, setStrategyToEdit] = useState<StrategyConfig | undefined>(undefined);
+    const [lastStrategy, setLastStrategy] = useState<StrategyConfig | null>(null);
+
+    // Save / History state
+    const [isSaving, setIsSaving] = useState(false);
+    const [savedOk, setSavedOk] = useState(false);
+    const [historyRows, setHistoryRows] = useState<any[]>([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
 
     // Data Selection State
     const [symbol, setSymbol] = useState("BTC");
@@ -129,9 +138,11 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
     const runBacktest = async (strategy: StrategyConfig) => {
         setIsRunning(true);
         setResult(null);
+        setSavedOk(false);
+        setLastStrategy(strategy);
         await new Promise(resolve => setTimeout(resolve, 1500));
         try {
-            const res = BacktestService.runBacktest(activeData, strategy); // Use activeData
+            const res = BacktestService.runBacktest(activeData, strategy);
             setResult(res);
         } catch (error) {
             console.error("Backtest failed", error);
@@ -139,6 +150,40 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
             setIsRunning(false);
         }
     };
+
+    const handleSaveResult = async () => {
+        if (!result || !lastStrategy) return;
+        setIsSaving(true);
+        try {
+            await saveBacktestResult(symbol, timeframe, `${symbol} ${timeframe} Strategy`, lastStrategy, result);
+            setSavedOk(true);
+            setTimeout(() => setSavedOk(false), 3000);
+        } catch (e) {
+            console.error("Failed to save result", e);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleSaveStrategy = async (name: string, config: StrategyConfig) => {
+        try {
+            await saveStrategy(name, config);
+        } catch (e) {
+            console.error("Failed to save strategy", e);
+        }
+    };
+
+    const loadHistory = useCallback(async () => {
+        setHistoryLoading(true);
+        try {
+            const rows = await getSavedBacktests();
+            setHistoryRows(rows);
+        } catch (e) {
+            console.error("Failed to load history", e);
+        } finally {
+            setHistoryLoading(false);
+        }
+    }, []);
 
     const handleEditStrategy = (strategy: StrategyConfig) => {
         setStrategyToEdit(strategy);
@@ -284,7 +329,44 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
                                     </div>
                                 )}
 
-                                {!isRunning && !result && (
+                                {/* History Panel */}
+                                {showHistory && !isRunning && (
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="font-bold text-lg flex items-center gap-2"><History className="w-5 h-5 text-primary" /> Saved Backtests</h3>
+                                            <Button size="sm" variant="ghost" onClick={() => setShowHistory(false)}>Close</Button>
+                                        </div>
+                                        {historyLoading ? (
+                                            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+                                        ) : historyRows.length === 0 ? (
+                                            <div className="text-center py-12 text-muted-foreground">
+                                                <History className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                                                <p>No saved backtests yet.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-3">
+                                                {historyRows.map((row: any) => (
+                                                    <div key={row.id} className="bg-card border border-border/50 rounded-xl p-4 group">
+                                                        <div className="flex items-start justify-between">
+                                                            <div>
+                                                                <div className="font-semibold font-mono">{row.symbol} · {row.timeframe}</div>
+                                                                <div className="text-xs text-muted-foreground mt-0.5">{new Date(row.created_at).toLocaleDateString()}</div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className={`font-bold text-lg ${row.result?.totalPnLPercent >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                                                                    {row.result?.totalPnLPercent?.toFixed(1)}%
+                                                                </div>
+                                                                <div className="text-xs text-muted-foreground">{row.result?.winRate?.toFixed(0)}% win rate</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {!showHistory && !isRunning && !result && (
                                     <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
                                         <div className="w-32 h-32 bg-gradient-to-tr from-muted to-muted/50 rounded-full flex items-center justify-center mb-6 shadow-inner border border-border/10 dark:from-gray-800 dark:to-gray-900 dark:border-white/5">
                                             <Zap className="h-12 w-12 text-gray-600" />
@@ -295,11 +377,34 @@ export function BacktestDashboard({ marketData: initialData }: BacktestDashboard
                                             <br />
                                             Initialize a strategy sequence to generate performance analytics.
                                         </p>
+                                        <Button
+                                            variant="outline" size="sm" className="mt-4 gap-2"
+                                            onClick={() => { setShowHistory(true); loadHistory(); }}
+                                        >
+                                            <History className="w-4 h-4" /> View History
+                                        </Button>
                                     </div>
                                 )}
 
-                                {!isRunning && result && (
-                                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                                {!showHistory && !isRunning && result && (
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+                                        {/* Save bar */}
+                                        <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-border/30">
+                                            <Button
+                                                size="sm" variant="outline" className="gap-1.5"
+                                                onClick={handleSaveResult}
+                                                disabled={isSaving || savedOk}
+                                            >
+                                                {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : savedOk ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Save className="w-3.5 h-3.5" />}
+                                                {savedOk ? "Saved!" : "Save Result"}
+                                            </Button>
+                                            <Button
+                                                size="sm" variant="ghost" className="gap-1.5 text-muted-foreground"
+                                                onClick={() => { setShowHistory(true); loadHistory(); }}
+                                            >
+                                                <History className="w-3.5 h-3.5" /> History
+                                            </Button>
+                                        </div>
                                         <BacktestResults result={result} />
                                     </div>
                                 )}
